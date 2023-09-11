@@ -21,6 +21,8 @@ public class User {
     @Column(name = "email", unique=true)
     private String email;
     private String phoneNumber;
+//    @Enumerated(EnumType.STRING)
+    private LoginProvider loginProvider;
 
 
     @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))

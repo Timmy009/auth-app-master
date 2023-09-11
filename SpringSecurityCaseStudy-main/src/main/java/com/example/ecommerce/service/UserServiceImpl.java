@@ -1,27 +1,26 @@
-package com.example.ecommerce.serviceImpl;
+package com.example.ecommerce.service;
 
-import com.example.ecommerce.config.JwtService;
+import com.example.ecommerce.Security.JwtService;
 import com.example.ecommerce.dto.request.*;
+import com.example.ecommerce.dto.response.GetUserResponse;
 import com.example.ecommerce.dto.response.LoginResponse;
 import com.example.ecommerce.dto.response.RegistrationResponse;
 import com.example.ecommerce.exception.*;
 import com.example.ecommerce.model.*;
 import com.example.ecommerce.repository.*;
-import com.example.ecommerce.service.*;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import static com.example.ecommerce.exception.ExceptionMessage.USER_NOT_FOUND_EXCEPTION;
 import static com.example.ecommerce.utils.EmailUtils.buildEmail;
 import static com.example.ecommerce.utils.EmailUtils.generateOTP;
 import static java.time.LocalDateTime.now;
@@ -52,7 +51,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public RegistrationResponse register(UserRegisterRequest registerRequest) {
-        //Optional<User> foundUser = userRepository.findUserByEmail(registerRequest.getEmail());
+
         boolean foundUser = userRepository.existsByEmail(registerRequest.getEmail());
         if (foundUser){
             throw new UserAlreadyExistException("User Already Exist");
@@ -85,9 +84,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public LoginResponse login(LoginRequest loginRequest) {
-        User foundUser = findUserByEmail(loginRequest.getEmail());
+        User foundUser = getUserByEmail(loginRequest.getEmail());
 
         if (!passwordEncoder.matches(loginRequest.getPassword(), foundUser.getPassword())){
+            System.out.println("error");
             throw new PasswordMismatchException("incorrect password");
         }
         authenticationManager.authenticate(
@@ -103,9 +103,31 @@ public class UserServiceImpl implements UserService {
 
     }
 
+
+    @Override
+    public GetUserResponse getUserById(Long id) {
+        Optional<User> foundUser = userRepository.findUserById(id);
+        User user = foundUser.orElseThrow(
+                ()->new UserNotFoundException(USER_NOT_FOUND_EXCEPTION.getMessage())
+        );
+
+        GetUserResponse getUserResponse = buildUserResponse(user);
+
+        return getUserResponse;
+    }
+
+    private static GetUserResponse buildUserResponse(User savedUser) {
+        return GetUserResponse.builder()
+                .id(savedUser.getId())
+
+                .fullName(savedUser.getFirstName() + " " + savedUser.getLastName())
+                .phoneNumber(savedUser.getPhoneNumber())
+                .email(savedUser.getEmail())
+                .build();
+    }
     @Override
     public String confirmToken(ConfirmationTokenRequest confirmationTokenRequest) {
-        User foundUser = findUserByEmail(confirmationTokenRequest.getEmail());
+        User foundUser = getUserByEmail(confirmationTokenRequest.getEmail());
         ConfirmationToken confirmationToken = confirmTokenService.getConfirmationToken(confirmationTokenRequest.getToken())
                 .orElseThrow(()-> new TokenNotFoundException("token does not exist"));
         if (confirmationToken.getExpiredAt().isBefore(LocalDateTime.now())){
@@ -122,17 +144,7 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    @Override
-    public List<User> getAllUser() {
-        return userRepository.findAll();
-    }
 
-    @Override
-    public User findUserById(Long userId) {
-        if (userRepository.findById(userId).isEmpty()) throw new UserNotFoundException("user not found");
-        return userRepository.findById(userId).get();
-//        return user.get();
-    }
 
     @Override
     public User findUserByFirstName(String firstName) {
@@ -140,8 +152,25 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User findUserByEmail(String email) {
-        return userRepository.findUserByEmail(email).orElseThrow(()->new UserNotFoundException("user not found"));
+    public GetUserResponse findUserByEmail(String email) {
+        Optional<User> foundUser = userRepository.findUserByEmail(email);
+        User user = foundUser.orElseThrow(
+                ()->new UserNotFoundException(USER_NOT_FOUND_EXCEPTION.getMessage())
+        );
+
+        GetUserResponse getUserResponse = buildUserResponse(user);
+
+        return getUserResponse;
+    }
+    public User getUserByEmail(String email) {
+        Optional<User> foundUser = userRepository.findUserByEmail(email);
+        User user = foundUser.orElseThrow(
+                ()->new UserNotFoundException(USER_NOT_FOUND_EXCEPTION.getMessage())
+        );
+
+        GetUserResponse getUserResponse = buildUserResponse(user);
+
+        return user;
     }
 
 }

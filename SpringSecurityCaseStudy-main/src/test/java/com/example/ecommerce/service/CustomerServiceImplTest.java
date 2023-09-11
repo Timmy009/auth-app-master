@@ -1,4 +1,4 @@
-package com.example.ecommerce.serviceImpl;
+package com.example.ecommerce.service;
 
 import com.example.ecommerce.dto.request.LoginRequest;
 import com.example.ecommerce.dto.request.UserRegisterRequest;

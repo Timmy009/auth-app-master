@@ -1,4 +1,4 @@
-package com.example.ecommerce.serviceImpl;
+package com.example.ecommerce.service;
 
 import com.example.ecommerce.dto.request.EmailRequest;
 import com.example.ecommerce.service.EmailService;

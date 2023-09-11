@@ -1,4 +1,4 @@
-package com.example.ecommerce.serviceImpl;
+package com.example.ecommerce.service;
 
 import com.example.ecommerce.model.ConfirmationToken;
 import com.example.ecommerce.repository.ConfirmationTokenRepository;

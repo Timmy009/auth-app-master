@@ -1,4 +1,4 @@
-package com.example.ecommerce.config;
+package com.example.ecommerce.Security;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
