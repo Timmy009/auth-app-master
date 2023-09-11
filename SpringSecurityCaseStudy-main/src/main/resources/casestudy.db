@@ -1,0 +1,44 @@
+# -*- coding: utf-8 -*-
+# MySQL Workbench Python script
+# <description>
+# Written in MySQL Workbench 8.0.32
+
+import grt
+#import mforms
+CREATE TABLE address (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    street_name VARCHAR(255),
+    street_number VARCHAR(255),
+    town VARCHAR(255),
+    city VARCHAR(255)
+);
+
+CREATE TABLE secured_user (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    email VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE user_role (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    user_id BIGINT NOT NULL,
+    role VARCHAR(255) NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES secured_user (id)
+);
+
+CREATE TABLE user (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    first_name VARCHAR(255),
+    last_name VARCHAR(255),
+    password VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    phone_number VARCHAR(255),
+    is_valid BOOLEAN NOT NULL
+);
+
+CREATE TABLE user_role (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    user_id BIGINT NOT NULL,
+    role VARCHAR(255) NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES user (id)
+);
